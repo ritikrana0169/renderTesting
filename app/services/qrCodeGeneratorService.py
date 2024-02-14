@@ -181,7 +181,7 @@ def generate_qrcode(identifier, user_result, imgUrl,event_result):
         print("Image saved successfully")
         print(save_path)
         # Hardcoded recipient email for testing, should be user_result.email
-        recipient_email = 'saviji520@gmail.com'
+        recipient_email = user_result.email
 
         # Call the function to send an email with the QR code attached
         send_email_with_attachment(recipient_email, save_path, event_result,user_result)
@@ -205,13 +205,19 @@ def check_smtp_credentials(HOST, PORT, FROM_EMAIL, PASSWORD,eventData, userData)
         print(f"SMTP credentials are incorrect or cannot connect to the server: {e}")
         return False
 
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+
 def send_email_with_attachment(recipient_email, image_path, eventData, userData):
     # SMTP email configuration
     HOST = "smtp-mail.outlook.com"
     PORT = 587
-    FROM_EMAIL = os.getenv("EMAIL")
+    
+    FROM_EMAIL = os.getenv("EMAIL") 
     PASSWORD = os.getenv("PASSWORD")
-    # print(FROM_EMAIL+" "+PASSWORD)
  
     # Check if SMTP credentials are correct
     if not check_smtp_credentials(HOST, PORT, FROM_EMAIL, PASSWORD,eventData, userData):
@@ -249,7 +255,13 @@ def send_email_with_attachment(recipient_email, image_path, eventData, userData)
     # Attach the QR code image
     with open(image_path, 'rb') as image_file:
         image = MIMEImage(image_file.read(), name="invitation_image.png")
+        print("i am here")
         msg.attach(image)
+
+    # Attach the additional image
+    with open('app\logos\MCD.png', 'rb') as additional_image_file:
+        additional_image = MIMEImage(additional_image_file.read(), name="MasaiConvocationDay.png")
+        msg.attach(additional_image)
 
     try:
         # Attempt to send the email using SMTP
