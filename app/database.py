@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-import os
 
 app = Flask(__name__)
 CORS(app, origins="*")
@@ -10,8 +9,6 @@ CORS(app, origins="*")
 # Initialize SQLAlchemy and Bcrypt
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-
-CORS(app, origins='*')  # for ngrok integration
 
 # Set PostgreSQL credentials
 db_username = 'db_0vxj_user'
