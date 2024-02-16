@@ -26,7 +26,7 @@ sql_db_name=os.getenv("MYSQL_DB_NAME")
 sql_password = os.getenv("MYSQL_PASSWORD")
 
 # Configure the database connection
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{sql_username}:{sql_password}@localhost/{sql_db_name}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{sql_username}:{sql_password}@localhost/{sql_db_name}'
 # Set PostgreSQL credentials
 db_username = 'db_0vxj_user'
 db_password = 'UYyB3vLeKq78q3edzk35mFLXCeZQpMPU'
