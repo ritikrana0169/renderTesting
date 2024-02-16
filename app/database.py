@@ -1,18 +1,23 @@
-from urllib.parse import quote
 from flask import Flask
-from app.models.model import db
+from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+<<<<<<< HEAD
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
+=======
+from flask_bcrypt import Bcrypt
+>>>>>>> 044f0bf386c03288e1aa009f2f6aae3cc9b817d2
 
 app = Flask(__name__)
 CORS(app, origins="*")
-from flask_bcrypt import Bcrypt
 
-# from flask_cors import CORS
+# Initialize SQLAlchemy and Bcrypt
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
+<<<<<<< HEAD
 # app = Flask(__name__)
 
 
@@ -28,11 +33,18 @@ sql_password = os.getenv("MYSQL_PASSWORD")
 
 # Configure the database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{sql_username}:{sql_password}@localhost/{sql_db_name}'
+=======
+# Set PostgreSQL credentials
+db_username = 'db_0vxj_user'
+db_password = 'UYyB3vLeKq78q3edzk35mFLXCeZQpMPU'
+db_host = 'localhost'  # Render usually provides a connection via localhost
+db_port = '5432'
+db_name = 'db_0vxj'
+
+# Configure the database connection
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}'
+>>>>>>> 044f0bf386c03288e1aa009f2f6aae3cc9b817d2
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database
 db.init_app(app)
-
-# Create tables if they don't exist
-with app.app_context():
-    db.create_all()
