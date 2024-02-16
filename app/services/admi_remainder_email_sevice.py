@@ -15,7 +15,7 @@ def send_email(receiver_email, body,Subject):
     message["To"] = receiver_email
     message["Subject"] =Subject
     message.attach(MIMEText(body, "plain"))
-
+ 
     # Connect to the SMTP server
     smtp_server = "smtp.outlook.com"  # Change this to your SMTP server address
     port = 587 # This is usually the default port for SMTP

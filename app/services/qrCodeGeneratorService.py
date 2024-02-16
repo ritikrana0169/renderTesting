@@ -3,14 +3,14 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
+from email.mime.application import MIMEApplication
 import string
 from dotenv import load_dotenv
+load_dotenv()
 import qrcode
 import random
 import os
 from app.models.model import EmailError, db, User, Event, QRCode,Attendance,Device
-
-load_dotenv()
 # Repositories for database operations related to users, events, and QR codes
 class UserRepository:
     def find_user_by_id(self, user_id):
@@ -194,53 +194,64 @@ def generate_qrcode(identifier, user_result, imgUrl,event_result):
 
 
 # Function to send an email with a QR code attached
-def check_smtp_credentials(HOST, PORT, FROM_EMAIL, PASSWORD,eventData, userData):
+def check_smtp_credentials(HOST, PORT, SMTP_USER, PASSWORD,eventData, userData):
     try:
         with smtplib.SMTP(HOST, PORT) as smtp:
             smtp.starttls()
-            smtp.login(FROM_EMAIL, PASSWORD)
+            smtp.login(SMTP_USER, PASSWORD)
         return True
     except Exception as e:
         save_email_error(userData.id, eventData.id)
         print(f"SMTP credentials are incorrect or cannot connect to the server: {e}")
         return False
 
-import os
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
+ 
 
 def send_email_with_attachment(recipient_email, image_path, eventData, userData):
     # SMTP email configuration
-    HOST = "smtp-mail.outlook.com"
-    PORT = 587
+    HOST = os.getenv("SMTP_ENDPOINT")
+    PORT = 587 
     
-    FROM_EMAIL = os.getenv("EMAIL") 
-    PASSWORD = os.getenv("PASSWORD")
+    FROM_EMAIL = os.getenv("FROM_EMAIL") 
+    PASSWORD = os.getenv("SMTP_PASSWORD")
+    SMTP_USER=os.getenv("SMTP_USER")
+    print(FROM_EMAIL)
  
     # Check if SMTP credentials are correct
-    if not check_smtp_credentials(HOST, PORT, FROM_EMAIL, PASSWORD,eventData, userData):
-        print("SMTP credentials are incorrect. Please check and try again.")
-        return
- 
+    # if not check_smtp_credentials(HOST, PORT, SMTP_USER, PASSWORD,eventData, userData):
+    #     print("SMTP credentials are incorrect. Please check and try again.")
+    #     return
+   
     # Email content 
     subject = f"Invitation to Our {eventData.event_title} Event"
     body = f"""
-    Dear {userData.first_name} {userData.last_name},
+Hey {userData.first_name+" "+userData.last_name},
 
-    We are delighted to invite you to our {eventData.event_title} event. Join us for a day filled with
-    joy, laughter, and memorable moments.
+Only 1 day left until our big event, and we can't contain our excitement to see each and every one of you! Whether you're already in Bangalore or making your way here, get ready for what promises to be the one of the best day of your life.
 
-    Date: {eventData.event_date}
-    Time: {eventData.start_time}
-    Venue: {eventData.event_location}
+You'll only be able to enter the auditorium at the venue using the attached QR Code, so keep that QR code handy! 🎟️
 
-    Attached to this email, you will find a personalized invitation QR Code.
-    We hope to see you there!
+Once you enter the venue, (Address : St. John’s Auditorium, Gate no. 5, Koramangla). Proceed to the registration desk and obtain your entry tags. Do carry your photo ID card.
+Venue Location: https://maps.app.goo.gl/kYjsmG8qyx8ugbQM7
 
-    Best regards,
-    Masai School
+The Day Flow
+
+    * 9:00 am sharp: Registration
+    * 10:00 am - 1:00 pm:   Convocation Rehearsal (trials)
+    * 1:00 pm - 1:30 pm: Lunch
+    * 1:30 pm - 5:30 pm: Convocation
+    * 5:30 pm - 7:30 pm:  Masai Fest
+    * 7:30 pm onwards Dinner
+
+We've lined up a plethora of activities, experience zones, and a networking hour for you all. And of course, there will be plenty of photo opportunities, so dress to impress! Don't forget, you'll receive your graduation cap and gown.
+Remember, the reporting time at the venue is 9 am sharp ⏰ Registration ends at 10 o'clock, and latecomers unfortunately won't be allowed in the auditorium. Missing the rehearsal means missing the actual convocation, so be on time!
+
+For many of you, this will be your very first convocation, and we couldn't be prouder. Wishing you all the luck as you embark on this exciting journey.
+
+Last but not least, make sure to join our WhatsApp group for all the latest updates and communication.
+WhatsApp Group: https://chat.whatsapp.com/LMI5VFU0xAk2JtSZCsaEjs
+
+See you soon! 🎓✨
     """
 
     # Create a MIMEMultipart object for email composition
@@ -255,21 +266,25 @@ def send_email_with_attachment(recipient_email, image_path, eventData, userData)
     # Attach the QR code image
     with open(image_path, 'rb') as image_file:
         image = MIMEImage(image_file.read(), name="invitation_image.png")
-        print("i am here")
+        print("QrCode fetched")
         msg.attach(image)
 
-    # Attach the additional image
-    with open('app\logos\MCD.png', 'rb') as additional_image_file:
-        additional_image = MIMEImage(additional_image_file.read(), name="MasaiConvocationDay.png")
-        msg.attach(additional_image)
-
-    try:
+    # Attach the additional pdf
+    with open('app/logos/convocation.pdf', 'rb') as convocation_pdf:
+        convocation_pdf = MIMEApplication(convocation_pdf.read(), name="Convocation Protocol.pdf")
+        print("MCD PDF Fetched")
+        msg.attach(convocation_pdf)
+ 
+    try: 
         # Attempt to send the email using SMTP
         with smtplib.SMTP(HOST, PORT) as smtp:
             smtp.starttls()
-            smtp.login(FROM_EMAIL, PASSWORD)
-            smtp.sendmail(FROM_EMAIL, recipient_email, msg.as_string())
-        print("Email sent successfully")
+            if(smtp.login(SMTP_USER, PASSWORD)):
+                smtp.sendmail(FROM_EMAIL, recipient_email, msg.as_string())
+                print("Email sent successfully")
+            else:
+                save_email_error(userData.id, eventData.id)
+                print("SMTP credentials are incorrect. Please check and try again.")
 
     except Exception as e:
         # Print an error message if sending email fails

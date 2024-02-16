@@ -52,8 +52,10 @@ def check_qrcode_scanned(encrypted_qr_identifier, device_id):
 
             if qr_code.is_scanned:
                 return {
+                    'email':user_data.email,
+                    'name':user_data.first_name+" "+user_data.last_name,
                     'message': f'Qr Code Already Scanned'
-                }
+                }  
             else:
                 # If QR code is present but not scanned, update the status
                 qr_code.is_scanned = True
@@ -85,6 +87,8 @@ def check_qrcode_scanned(encrypted_qr_identifier, device_id):
                     db.session.commit()
 
                 return {
+                    'email':user_data.email,
+                    'name':user_data.first_name+" "+user_data.last_name,
                     'message': f'Welcome! {user_data.first_name+" "+user_data.last_name} , Your QR code Scanned using device {device_data.name}. '
                                f'Now, you can join the event.'
                 }

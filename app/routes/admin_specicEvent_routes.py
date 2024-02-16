@@ -1,5 +1,7 @@
 import re
-from flask import Blueprint, jsonify, request  
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+from app.routes.user_routes import role_required  
 from app.services.admin_specificEvent_service import EventDetailsResource
 from app.database import app
 from app.models.model import db, Event 
@@ -21,6 +23,8 @@ event_bp3 = Blueprint('event_bp3', __name__)
 # event_service = EventService() 
 
 @event_bp3.route('/admin/event/<int:event_id>', methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def get_events_for_user_by_userid(event_id):
     event_service = EventDetailsResource()
     events = event_service.get_events_for_user(event_id)

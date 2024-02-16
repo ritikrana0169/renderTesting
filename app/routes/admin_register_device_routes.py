@@ -1,13 +1,19 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from app.routes.user_routes import role_required
 from app.services.admin_register_device_service import AdminDeviceService
 from app.exception.eventDeviceExecption import DeviceException, GenericException
 # import ipaddress
 from app.services.admin_register_device_service import get_registered_devices
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from app.routes.user_routes import role_required
 
 device_routes = Blueprint('devices', __name__)
 
 
 @device_routes.route('/admin/device', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
 def add_new_device():
     """
     Endpoint to add a new device.
@@ -55,6 +61,8 @@ def add_new_device():
 
 
 @device_routes.route('/admin/device/<int:device_id>', methods=['PUT'])
+# @jwt_required()
+# @role_required('Admin')
 def update_device(device_id):
     """
     {
@@ -93,6 +101,8 @@ def update_device(device_id):
 
 
 @device_routes.route('/admin/device/<int:device_id>', methods=['DELETE'])
+# @jwt_required()
+# @role_required('Admin')
 def remove_device_endpoint(device_id):
     try:
         response = AdminDeviceService.remove_device(device_id)
@@ -103,6 +113,8 @@ def remove_device_endpoint(device_id):
 
 
 @device_routes.route('/admin/devices', methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def get_devices():
     try:
         page = request.args.get('page', default=1, type=int)

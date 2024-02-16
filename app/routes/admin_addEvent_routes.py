@@ -4,12 +4,16 @@ from app.services.admin_addEvent_service import CreateEventResource
 from datetime import datetime
 from app.exception.admin_externalUser_exception import EventException, GenericException
 from datetime import datetime
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from app.routes.user_routes import role_required
 
 addEevent_bp = Blueprint('addEevent_bp', __name__)
 
 
 # Route to create a new event
 @addEevent_bp.route('/admin/events', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
 def create_event():
   data = request.get_json()
   if 'event_type' not in data or data['event_type'].upper() not in ['ONCE', 'RECURRING']:

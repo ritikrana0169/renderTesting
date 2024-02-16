@@ -30,5 +30,4 @@ app/database.py/
 
 # .env file
 .env/
-
-app/images/
+.env

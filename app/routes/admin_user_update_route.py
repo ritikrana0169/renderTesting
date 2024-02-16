@@ -1,12 +1,16 @@
 import re
 
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from app.routes.user_routes import role_required
 from app.services.admin_user_update_service import AdminUserUpdateService
 
 update_users_blueprint = Blueprint('updateuser', __name__)
 
 
 @update_users_blueprint.route('/admin/users/<int:user_id>', methods=['PUT'])
+# @jwt_required()
+# @role_required('Admin')
 def update_user(user_id):
     """ PUT request data
         {

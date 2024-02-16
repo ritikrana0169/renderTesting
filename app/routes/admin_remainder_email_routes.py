@@ -1,6 +1,8 @@
 # route.py
 from flask import Flask, Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from app.models.model import User, Event, db
+from app.routes.user_routes import role_required
 from app.services.admi_remainder_email_sevice import send_email
 
 remainder_email = Blueprint('remainder_email', __name__)
@@ -8,6 +10,8 @@ remainder_email = Blueprint('remainder_email', __name__)
 
 # API endpoint to send reminder emails
 @remainder_email.route('/send-reminder-email', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
 def send_reminder_email():
     data = request.json
     user_id = data.get('user_id')
@@ -52,6 +56,8 @@ Best regards,
 
 
 @remainder_email.route('/send-reminder-bulk-emails', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
 def send_reminder_emails():
     data = request.json
     event_id = data.get('event_id')

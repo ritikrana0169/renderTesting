@@ -16,6 +16,24 @@ from flask_bcrypt import check_password_hash
 
 
 
+
+
+#method for securing routes according to roles
+def role_required(*roles):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            current_user_roles = get_jwt_identity().get('roles', [])
+
+            if any(role in current_user_roles for role in roles):
+                return fn(*args, **kwargs)
+            else:
+                return jsonify(msg='Access denied'), 403
+
+        return decorator
+    return wrapper
+
+
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, time):
@@ -28,6 +46,8 @@ app.json_encoder = CustomJSONEncoder  # Set custom JSON encoder
 # creating blueprint for get_allevents_of_user route
 events_blueprint = Blueprint('events', __name__)
 @events_blueprint.route('/get_allevents_of_user/<int:user_id>', methods=['GET'])
+@jwt_required()
+@role_required('User')
 def get_events_for_user_by_userid(user_id):
     """
         Get all events for a specific user by user ID.
@@ -65,6 +85,8 @@ def get_events_for_user_by_userid(user_id):
 
 
 @events_blueprint.route('/get_upcoming_eventsOf_user/<int:user_id>', methods=['GET'])
+@jwt_required()
+@role_required('User')
 def get_upcoming_events_for_user(user_id):
     """
         Get upcoming events for a specific user by user ID.
@@ -103,6 +125,8 @@ def get_upcoming_events_for_user(user_id):
 
 
 @events_blueprint.route('/get_completed_events_of_user/<int:user_id>', methods=['GET'])
+@jwt_required()
+@role_required('User')
 def get_completed_events_for_user(user_id):
     """
         Get completed events for a specific user by user ID.
@@ -141,6 +165,8 @@ def get_completed_events_for_user(user_id):
 
 
 @events_blueprint.route('/get_active_events_of_user/<int:user_id>', methods=['GET'])
+# @jwt_required()
+# @role_required('User')
 def get_active_events_for_user(user_id):
     """
         Get active events for a specific user by user ID.
@@ -202,24 +228,7 @@ def get_event(event_id):
 
 
 
-#method for securing routes according to roles
-def role_required(*roles):
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-            current_user_roles = get_jwt_identity().get('roles', [])
-
-
-            if any(role in current_user_roles for role in roles):
-                return fn(*args, **kwargs)
-            else:
-                return jsonify(msg='Access denied'), 403
-
-        return decorator
-    return wrapper
-
-
-
+      
 #creating blueprint for login auth
 auth_bp = Blueprint("auth", __name__)
 

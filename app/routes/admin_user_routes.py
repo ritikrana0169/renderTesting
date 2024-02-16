@@ -10,7 +10,7 @@ from flask import request
 user_blueprint = Blueprint('user', __name__)
 
 @user_blueprint.route('/welcome')
-@jwt_required()
+# @jwt_required()
 def greet():
     return jsonify({'message': 'Hello world'})
 
@@ -19,6 +19,8 @@ def greet():
                       methods=['GET'])
 @user_blueprint.route('/admin/users/<int:page>/<int:per_page>/<string:sort_by>/<string:order>/<string:filter>',
                       methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def get_users_with_options(page, per_page, sort_by, order, filter=None):
     """
     Method:GET, endpoint: /api/admin/users/2/5/address/desc/role=user
@@ -68,8 +70,8 @@ def get_users_with_options(page, per_page, sort_by, order, filter=None):
 
 
 @user_blueprint.route('/admin/users', methods=['GET'])
-@jwt_required()
-@role_required('Admin')
+# @jwt_required()
+# @role_required('Admin')
 def get_all_users():
     try:
         # Get pagination parameters from the request
@@ -88,6 +90,8 @@ def get_all_users():
 
 
 @user_blueprint.route('/admin/users', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
 def add_user():
     """ POST request data
         {
@@ -134,6 +138,8 @@ def add_user():
 # Get the user by id
 
 @user_blueprint.route('/admin/users/<int:user_id>', methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def get_user(user_id):
     # Validate for user_id
     if not isinstance(user_id, int) or user_id <= 0:
@@ -145,6 +151,8 @@ def get_user(user_id):
 
 # Delete the user by id
 @user_blueprint.route('/admin/users/<int:user_id>', methods=['DELETE'])
+# @jwt_required()
+# @role_required('Admin')
 def delete_user(user_id):
     # Validate user_id
     if user_id <= 0:
@@ -155,6 +163,8 @@ def delete_user(user_id):
 
 
 @user_blueprint.route('/admin/users/suggest', methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def suggest_usernames():
     """
     Method: GET, endpoint: /admin/users/suggest

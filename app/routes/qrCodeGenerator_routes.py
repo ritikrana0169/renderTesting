@@ -195,6 +195,7 @@ def get_details(event_id, page, page_size):
         present_filter = request.args.get('present')
         absent_filter = request.args.get('absent')
         search_query = request.args.get('search')
+        
 
         attendance_data = AttendanceRepository().find_attendance_by_event_id(event_id)
         if not attendance_data:
@@ -223,11 +224,12 @@ def get_details(event_id, page, page_size):
             filtered_data = [record for record in attendance_data if record.status == "Absent"]
 
         if search_query:
-            # Retrieve user data for each attendance record and filter based on the user's name (case insensitive)
-            filtered_data = [record for record in filtered_data if UserRepository().find_user_by_id(record.user_id).first_name.lower().startswith(search_query.lower())]
+            # Retrieve user data for each attendance record and filter based on the user's first name or email (case insensitive)
+            filtered_data = [record for record in filtered_data if
+                             (UserRepository().find_user_by_id(record.user_id).first_name.lower().startswith(search_query.lower())) or
+                             (UserRepository().find_user_by_id(record.user_id).email.lower().startswith(search_query.lower()))]
 
         total_records = len(filtered_data)
-
 
         start_index = (page - 1) * page_size
         end_index = start_index + page_size
@@ -272,6 +274,7 @@ def get_details(event_id, page, page_size):
         return jsonify({"data": response_data}), 200
     except (AttributeError, ValueError) as e:
         return jsonify({"error": str(e)}), 404
+
 
 
 
@@ -347,7 +350,7 @@ def loop_email_information():
             event_result = event_repository.find_event_by_id(event_id)
             image_path="app/"+image_data
             # Hardcoded recipient email for testing, should be user_result.email
-            recipient_email = 'saviji520@gmail.com'
+            recipient_email = user_result.email
             find_and_delete_email_error_data=EmailErrorRepository().delete_email_error_by_ids(user_id,event_id)
             if(find_and_delete_email_error_data):
                 if user_id is not None and event_id is not None:

@@ -1,6 +1,9 @@
 import re
+
+from flask_jwt_extended import jwt_required
 from app.database import app
 from flask import Blueprint, jsonify, request
+from app.routes.user_routes import role_required  
 from app.services.admin_event_service import EventService
 from json import JSONEncoder
 from app.models.model import db, Event
@@ -9,6 +12,8 @@ from app.services.admin_event_service import EventService
 
 
 # from app.services.admin_addExternal_user_service import AdminExternalUserService
+
+
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, time):
@@ -27,7 +32,9 @@ event_service = EventService()
 
 
 # Getting all events  
-@all_event_bp.route('/get_allevents', methods=['GET'])
+@all_event_bp.route('/get_allevents', methods=['GET'])  
+# @jwt_required()
+# @role_required('Admin')
 def get_events_for_user_by_userid():
     event_service = EventService()
     try:
@@ -63,6 +70,8 @@ def get_events_for_user_by_userid():
 
 # Update event details
 @event_bp.route('/admin/events/<int:event_id>', methods=['PUT'])
+# @jwt_required()
+# @role_required('Admin')
 def update_event(event_id):
     # Get updated data from request
     data = request.get_json()
@@ -92,6 +101,8 @@ def update_event(event_id):
 
 # Delete an event
 @event_bp.route('/admin/events/<int:event_id>', methods=['DELETE'])
+# @jwt_required()
+# @role_required('Admin')
 def delete_event(event_id):
     deleted = event_service.delete_event(event_id)
 
@@ -102,6 +113,8 @@ def delete_event(event_id):
 
 
 @event_bp.route('/admin/events', methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def get_events_by_type():
     # Get query parameters
     event_type = request.args.get('type')
@@ -117,6 +130,8 @@ def get_events_by_type():
 
 
 @event_bp.route('/admin/events/<int:event_id>/user', methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def search_users_in_event(event_id):
     try:
         search_query = request.args.get('search', '')

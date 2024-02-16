@@ -3,6 +3,9 @@ from flask import Flask
 from app.models.model import db
 from flask_cors import CORS
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 
 app = Flask(__name__)
 CORS(app, origins="*")
@@ -19,10 +22,12 @@ CORS(app, origins='*')  # for ngrok integration
 bcrypt = Bcrypt(app)  # bcrypt for hashing the password
 
 # Set sql password
-sql_password = quote('root')
+sql_username=os.getenv('MYSQL_USERNAME')
+sql_db_name=os.getenv("MYSQL_DB_NAME")
+sql_password = os.getenv("MYSQL_PASSWORD")
 
 # Configure the database connection
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://root:{sql_password}@localhost/db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{sql_username}:{sql_password}@localhost/{sql_db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database

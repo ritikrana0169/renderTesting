@@ -3,12 +3,15 @@ import re
 from flask import Blueprint, request, jsonify
 from app.services.admin_external_user_service import AdminExternalUserService
 from app.exception.admin_externalUser_exception import EventException, UserException, GenericException
-
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from app.routes.user_routes import role_required
 
 Externaluser_blueprint = Blueprint('Externaluser_blueprint', __name__)
 
 
 @Externaluser_blueprint.route('/events/<int:event_id>/add_external_user', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
 def add_external_user(event_id):
     """ POST request data
         {
@@ -58,6 +61,8 @@ def is_valid_mobile_number(phone):
 
 
 @Externaluser_blueprint.route('/events/<int:event_id>/external_user/<int:id>', methods=['DELETE'])
+# @jwt_required()
+# @role_required('Admin')
 def remove_external_user_endpoint(event_id, id):
     try:
         response = AdminExternalUserService.remove_external_user(event_id,id)
@@ -67,6 +72,8 @@ def remove_external_user_endpoint(event_id, id):
         return e.to_response()
     
 @Externaluser_blueprint.route('/events/<int:event_id>/external_user', methods=['GET'])
+# @jwt_required()
+# @role_required('Admin')
 def get_external_user_byEventId_endpoint(event_id):
     try:
         page = request.args.get('page', default=1, type=int)
@@ -80,6 +87,8 @@ def get_external_user_byEventId_endpoint(event_id):
 
 
 @Externaluser_blueprint.route('/events/<int:event_id>/add_external_users', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
 def add_external_users(event_id):
     """ POST request data
         {
@@ -113,18 +122,4 @@ def add_external_users(event_id):
 
     except (EventException, UserException, GenericException) as e:
         return e.to_response()
-
-# def is_valid_email(email):
-#     # Regular expression for a valid email address
-#     email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@gmail.com$')
-#     return bool(re.match(email_pattern, email))
-
-# def is_valid_mobile_number(phone):
-#     # Define a regular expression pattern for a mobile number starting with 6-9
-#     pattern = re.compile(r'^[6-9]\d{9}$')
-
-#     # Check if the mobile number matches the pattern
-#     match = re.match(pattern, phone)
-
-#     return bool(match)
 
