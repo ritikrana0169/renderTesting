@@ -7,7 +7,7 @@
 
 ### Setting up the Virtual Environment
 
-```bash
+```bash 
 # Creating the virtual environment
 python -m venv venv
 
